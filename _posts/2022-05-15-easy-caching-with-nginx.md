@@ -32,7 +32,7 @@ One of the greatest improvements of [HTTP 2.0](https://web.dev/performance-http2
 
 HTTP 2.0 is supported by most (if not all) browers nowadays and fully backwards compatible with HTTP 1.1 so there's very little reason for not including support for it.
 
-HTTP3/ HTTP over QUIC is the newest, hotest thing around and it works much faster than HTTP 2 but browser support is still very poor. That being said, if you want to play with it and nginx just follow [this guide](https://github.com/cloudflare/quiche/tree/master/nginx) and remember that QUIC works over UDP so you'll have to unblock that if you're behind a firewall.
+HTTP3/ HTTP over QUIC is the newest thing around and it is much faster than HTTP 2 but browser support is still very poor. That being said, some CDNs already support it and if you want to play with it on your server you can do so by following [this guide](https://github.com/cloudflare/quiche/tree/master/nginx). Moreover, since QUIC works over UDP you might need to change your firewall rules.
 
 #### How do I know which protocol I am using?
 Check the network panel on your browser devtools, enable the protocol column and check it's value, on Chrome the protocol column displays h3 for HTTP3.
