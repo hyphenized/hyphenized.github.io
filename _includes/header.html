@@ -1,0 +1,38 @@
+<header class="site-header">
+    <h1>
+      {%- if page.name != 'index.md' -%} 
+      <a href="{{ "/" | relative_url }}"><--</a>
+      {%- else -%}
+      --- 
+      {%- endif %} {{ site.title }}
+    </h1>
+    {%-if site.theme_config.show_description-%}
+      <p>{{ site.description }}</p>
+    {%-endif-%}
+    <button id="toggler" type="button">TOGGLE</button>
+    <script>
+        const themes = { dark: "🌙", light: "☀" };
+        
+        const defaultTheme = (() => {
+            const saved = localStorage.getItem("theme");
+            return saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        })();
+
+        let currentTheme = defaultTheme;
+        toggler.textContent = themes[currentTheme];
+
+        const root = document.querySelector('html');
+        root.classList.toggle(currentTheme);
+
+        toggler.onclick = () => {
+            const next = currentTheme == "light" ? 'dark' : 'light';
+            root.classList.toggle(currentTheme);
+            root.classList.toggle(next);
+
+            currentTheme = next;
+            toggler.textContent = themes[currentTheme];
+            try { localStorage.setItem("theme",currentTheme) } catch (err) {/* noop */}
+        }
+        window.onload = () => {root.classList.toggle("loaded")}
+    </script>
+  </header>
