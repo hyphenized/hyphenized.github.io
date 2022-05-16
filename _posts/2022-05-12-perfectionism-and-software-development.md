@@ -2,6 +2,7 @@
 layout: post
 title: Perfectionism and software development
 date: 2022-05-12 14:10 -0500
+categories: software perfectionism
 ---
 
 ### Why perfectionism is not a good approach for software development

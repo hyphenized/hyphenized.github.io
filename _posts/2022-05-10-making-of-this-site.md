@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Making of this site"
+title:  Making of this site
 date:    2022-05-10 20:13:51 -0500
 categories: jekyll 
 ---
