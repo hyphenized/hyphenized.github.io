@@ -5,21 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   
     <title>
-      --- hyphenized.dev</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+      --- Thoughts on React</title><!-- Begin Jekyll SEO tag v2.8.0 -->
 <meta name="generator" content="Jekyll v4.2.2" />
-<meta property="og:title" content="hyphenized.dev" />
+<meta property="og:title" content="Thoughts on React" />
 <meta name="author" content="hyphenized" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Random thoughts and hopefully useful material for you" />
-<meta property="og:description" content="Random thoughts and hopefully useful material for you" />
-<link rel="canonical" href="/404.html" />
-<meta property="og:url" content="/404.html" />
+<meta name="description" content="Having used React for a while I’ve started to find annoying the amount of boilerplate code that you need to achieve basic operations (which does not happen in other frameworks). For instance in Svelte you can define a variable counter to store your state, modify it directly and everything works fine out of the box. But, in React you would have to call useState(), deconstruct an array to get a reference to both a possibly stale value (unless you store it in a ref, then you have some other problems) and an updater function, not to say if you have custom logic handling you might also need to memoize and wrap this updater inside a handler function." />
+<meta property="og:description" content="Having used React for a while I’ve started to find annoying the amount of boilerplate code that you need to achieve basic operations (which does not happen in other frameworks). For instance in Svelte you can define a variable counter to store your state, modify it directly and everything works fine out of the box. But, in React you would have to call useState(), deconstruct an array to get a reference to both a possibly stale value (unless you store it in a ref, then you have some other problems) and an updater function, not to say if you have custom logic handling you might also need to memoize and wrap this updater inside a handler function." />
+<link rel="canonical" href="/react/2022/05/12/thoughts-on-react.html" />
+<meta property="og:url" content="/react/2022/05/12/thoughts-on-react.html" />
 <meta property="og:site_name" content="hyphenized.dev" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-12T14:13:00-05:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="hyphenized.dev" />
+<meta property="twitter:title" content="Thoughts on React" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"hyphenized"},"description":"Random thoughts and hopefully useful material for you","headline":"hyphenized.dev","url":"/404.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"hyphenized"},"dateModified":"2022-05-12T14:13:00-05:00","datePublished":"2022-05-12T14:13:00-05:00","description":"Having used React for a while I’ve started to find annoying the amount of boilerplate code that you need to achieve basic operations (which does not happen in other frameworks). For instance in Svelte you can define a variable counter to store your state, modify it directly and everything works fine out of the box. But, in React you would have to call useState(), deconstruct an array to get a reference to both a possibly stale value (unless you store it in a ref, then you have some other problems) and an updater function, not to say if you have custom logic handling you might also need to memoize and wrap this updater inside a handler function.","headline":"Thoughts on React","mainEntityOfPage":{"@type":"WebPage","@id":"/react/2022/05/12/thoughts-on-react.html"},"url":"/react/2022/05/12/thoughts-on-react.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="hyphenized.dev" /><link rel="shortcut icon" type="image/x-icon" href="" />
     <link rel="stylesheet" href="/assets/css/main.css" />
@@ -73,30 +74,24 @@
         }
         window.onload = () => {root.classList.toggle("loaded")}
     </script>
-  </header><style type="text/css" media="screen">
-  .container {
-    margin: 0px auto;
-    max-width: 600px;
-    text-align: center;
-  }
-  h1 {
-    margin: 30px 0;
-    font-size: 2rem;
-  }
-  h1._404{
-    line-height: 1;
-    letter-spacing: -1px;
-    font-size: 4rem;
-  }
-</style>
+  </header><!-- <a href="/"><--</a> --><article>
+  <p class="post-meta">
+    <time datetime="2022-05-12 14:13:00 -0500">2022-05-12</time>
+  </p>
+  
+  <h1>Thoughts on React</h1>
 
-<div class="container">
-  <h1 class="_404">404</h1>
+  <p>Having used React for a while I’ve started to find annoying the amount of boilerplate code that you need to achieve basic operations (which does not happen in other frameworks). For instance in Svelte you can define a variable <code class="language-plaintext highlighter-rouge">counter</code> to store your state, modify it directly and everything works fine out of the box. But, in React you would have to call useState(), deconstruct an array to get a reference to both a possibly stale value (unless you store it in a ref, then you have some other problems) and an updater function, not to say if you have custom logic handling you might also need to memoize and wrap this updater inside a handler function.</p>
 
-  <p><strong>Page not found :(</strong></p>
-  <p>The requested page could not be found.</p>
-</div>
+<p>You could get around this last point if you stick to class components but apparently, besides the slightly higher footprint that they have, in some cases they could end up increasing the amount of boilerplate code too.</p>
 
+<p>For what is worth, I am not saying Svelte is perfect (because it is not) but, I think developer happiness matters too!</p>
+
+<h4 id="why-do-you-work-with-react-then">Why do you work with React then?</h4>
+
+<p>Gotta know the rules to break ‘em. <img class="bttv" src="https://cdn.betterttv.net/emote/55f47f507f08be9f0a63ce37/2x"></p>
+
+</article>
       </div>
     </main>
   </body>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+    <title>
+      --- Making of this site</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Making of this site" />
+<meta name="author" content="hyphenized" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Where’s all the JavaScript/React/Svelte/Vue/etc ?" />
+<meta property="og:description" content="Where’s all the JavaScript/React/Svelte/Vue/etc ?" />
+<link rel="canonical" href="/jekyll/2022/05/10/making-of-this-site.html" />
+<meta property="og:url" content="/jekyll/2022/05/10/making-of-this-site.html" />
+<meta property="og:site_name" content="hyphenized.dev" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-10T20:13:51-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Making of this site" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"hyphenized"},"dateModified":"2022-05-10T20:13:51-05:00","datePublished":"2022-05-10T20:13:51-05:00","description":"Where’s all the JavaScript/React/Svelte/Vue/etc ?","headline":"Making of this site","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll/2022/05/10/making-of-this-site.html"},"url":"/jekyll/2022/05/10/making-of-this-site.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link type="application/atom+xml" rel="alternate" href="/feed.xml" title="hyphenized.dev" /><link rel="shortcut icon" type="image/x-icon" href="" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
+  </head><body>
+    <!--                            ██████████████                                -->
+<!--                        ╦███████████████████╦╕         █▓██████▄╦╤        -->
+<!--                     ╒█████████████████████████▄      ▐▀███ ██▀███████▄╦╕ -->
+<!--                   ╒█████████████████████████████▄   ╒█████▄▄▌▀██╛ █████  -->
+<!--                  ╔▓████▄███▄▀████████████████████▓  ████▌█▀████████▐╙╒   -->
+<!--                 ╔█████▐██▀███▐█████████▄████▄▐████▌▐████╔╛╛╒▐▐▐▀█████╛   -->
+<!--                ╒██████▄███████████████▌███▄██▌████▄▄ ╜▀████▄▄▌▄▀▄████    -->
+<!--     ▐▓╦        █████████▓▓▓╧▀▀░░░░▀▀▀██▀████▀███████       ██▀▀█████     -->
+<!--     ▐████╤    ▐█████████▀─║░░░     ░░░▒─▀███▓███████      ▐█╛            -->
+<!--     ╘███████╦ █████████ ▒  ╙╙╙╙╙╜╜╜░     ─▀█████████     ╒██             -->
+<!--      ▀██████████████████ ╙╜╜╜    ┴─▒╖╖╖▒ ▒─█████████     ▓█              -->
+<!--       ▀█████████████████▓▄▄              ▄████████▓╛   ╒▄█╛              -->
+<!--        ╢██████████████████████▄▄▄▄▄▄▄▄▄███████████▄▄▄█████               -->
+<!--         ╚▀███████████████████████████████████████████████╛               -->
+<!--           ╫▀████████████████████████████████████████████                 -->
+<!--            ▄▒▀███████████████████████████████████████▀╜                  -->
+<!--           ╒████████████████████████████████████████▓                     -->
+<!--           ██████████████████████████████████████▀                        -->
+<!--           ██████████████████████████████████████╛                        -->
+<!--          ▐██████████████████████████████████████                         -->
+    <main class="page-content" aria-label="Content">
+      <div class="container"><header class="site-header">
+    <h1><a href="/"><--</a> hyphenized.dev
+    </h1><p>Random thoughts and hopefully useful material for you</p><button id="toggler" type="button">TOGGLE</button>
+    <script>
+        const themes = { dark: "🌙", light: "☀" };
+        
+        const defaultTheme = (() => {
+            const saved = localStorage.getItem("theme");
+            return saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        })();
+
+        let currentTheme = defaultTheme;
+        toggler.textContent = themes[currentTheme];
+
+        const root = document.querySelector('html');
+        root.classList.toggle(currentTheme);
+
+        toggler.onclick = () => {
+            const next = currentTheme == "light" ? 'dark' : 'light';
+            root.classList.toggle(currentTheme);
+            root.classList.toggle(next);
+
+            currentTheme = next;
+            toggler.textContent = themes[currentTheme];
+            try { localStorage.setItem("theme",currentTheme) } catch (err) {/* noop */}
+        }
+        window.onload = () => {root.classList.toggle("loaded")}
+    </script>
+  </header><!-- <a href="/"><--</a> --><article>
+  <p class="post-meta">
+    <time datetime="2022-05-10 20:13:51 -0500">2022-05-10</time>
+  </p>
+  
+  <h1>Making of this site</h1>
+
+  <h4 id="wheres-all-the-javascriptreactsveltevueetc-">Where’s all the JavaScript/React/Svelte/Vue/etc ?</h4>
+
+<p>This site has no JavaScript(besides the dark mode toggler of course).</p>
+
+<p><em>“But why?”</em> you might ask, the main reason I chose to make it using HTML/CSS instead of using an static site generator like Gatsby or the like is that, nowadays most websites suffer of having unnecessary big bundles of JavaScript loading instead of what users actually visited the site for, content.</p>
+
+<p>Initially I wanted to make something shimmering that would showcase my skills/proficiency, probably with three.js, gsap and all that fancy stuff. However, including three.js alone would cause this website to load several times(6x~) slower! I chose to keep this stupid simple so that you, the reader/googlebot could save the most precious resource that you’ll never recover, time (<em>probably battery, cpu cycles, mobile data and some other things as well</em>).</p>
+
+<p>I think every developer should be mindful of the decisions they take, and not just do things because everyone else is doing them that way. That being said, there’s nothing wrong with trying out new technologies. What is wrong, however, is creating a problem where none exists as an excuse to implement a solution.</p>
+
+<div class="meme"><img src="/assets/memes/programmer_move.jpg" alt="I should write something to describe this image" /></div>
+
+<h4 id="kick-starting-the-blog-with-jekyll">Kick starting the blog with Jekyll</h4>
+
+<p>I have never used Jekyll before, but it’s very simple, you write some templates/layouts, then add some content in the form of markdown files and bang! There’s a blog.</p>
+
+<p>I would have enjoyed the process of getting everything ready much more had I not made a few mistakes along the way. I followed the quick start tutorial at Jekyll’s and soon ran across an issue after trying to use a theme that I liked.</p>
+
+<p>At the moment of writing, you need version <a href="https://pages.github.com/versions/">jekyll@3.9.2</a> for GitHub Pages to work. Unfortunately, the theme I chose was not compatible with Jekyll 4 and I did not realize this until I found out that the version 0.1 of the theme had been installed <img class="bttv" src="https://cdn.betterttv.net/emote/572accb540dbc1cb345d782b/1x">.</p>
+
+<p>I then switched back to Jekyll 3.9.2 but later I realized that wasn’t necessary because I could build my site locally and have GitHub pages serve that(or do the build step in a GH actions CI container).</p>
+
+<p>Doing the build step through Github Pages was not an option if I wanted to use a custom plugin to embed the bttv emojis since <a href="https://github.com/jekyll/jekyll/blob/v3.9.2/docs/_docs/plugins.md">GH Pages runs Jekyll in safe mode</a> (<em>which means no custom plugins</em>).</p>
+
+<p>Anyway enough talk, lets begin.</p>
+
+<div style="text-align: center">
+
+<img src="/assets/img/elizabethdevtools.jpg" />
+<em>This is where your data savings are going to</em>
+</div>
+
+<h2 id="picking-a-theme">Picking a theme</h2>
+
+<p>I found a theme I liked at <a href="https://jamstackthemes.dev/ssg/jekyll/">https://jamstackthemes.dev/ssg/jekyll/</a>. That being said, it didn’t work out of the box so if you’re unable to get everything working the problem might either be your version of jekyll, the theme, or something else (I’d check in that order).</p>
+
+<p>You can find some themes for code highlighting here:
+<a href="https://stylishthemes.github.io/Syntax-Themes/pygments/">https://stylishthemes.github.io/Syntax-Themes/pygments/</a> 
+or, make a custom one <a href="https://jwarby.github.io/jekyll-pygments-themes/builder.html">here</a>:</p>
+
+<h2 id="adding-dark-mode">Adding Dark mode</h2>
+<p>The easiest (and quickest) way to add dark mode to your website would be to just add something like <a href="https://watercss.netlify.app/">watercss</a>.</p>
+
+<p>However as you’ll see, adding dark mode is a piece of cake without any external dependencies. You only need css variables, media queries that target <code class="language-plaintext highlighter-rouge">prefers-color-scheme</code> and a small script to allow your users to toggle between both themes.</p>
+
+<p>We don’t have to worry too much about browser support since right now <a href="https://caniuse.com/css-variables">CSS Variables are supported by at least 94% of all browsers</a>. The story is a bit different for <code class="language-plaintext highlighter-rouge">prefers-color-scheme</code> but for those cases, we can load the light theme by default and allow the user to change it manually.</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">"toggler"</span> <span class="na">type=</span><span class="s">"button"</span><span class="nt">&gt;</span>TOGGLE<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+  <span class="kd">const</span> <span class="nx">themes</span> <span class="o">=</span> <span class="p">{</span> <span class="na">dark</span><span class="p">:</span> <span class="dl">"</span><span class="s2">🌙</span><span class="dl">"</span><span class="p">,</span> <span class="na">light</span><span class="p">:</span> <span class="dl">"</span><span class="s2">☀</span><span class="dl">"</span> <span class="p">};</span>
+  
+  <span class="kd">const</span> <span class="nx">defaultTheme</span> <span class="o">=</span> <span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">saved</span> <span class="o">=</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">"</span><span class="s2">theme</span><span class="dl">"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">saved</span> <span class="o">||</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">matchMedia</span><span class="p">(</span><span class="dl">'</span><span class="s1">(prefers-color-scheme: dark)</span><span class="dl">'</span><span class="p">).</span><span class="nx">matches</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">dark</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">light</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">})();</span>
+
+  <span class="kd">let</span> <span class="nx">currentTheme</span> <span class="o">=</span> <span class="nx">defaultTheme</span><span class="p">;</span>
+  <span class="nx">toggler</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">themes</span><span class="p">[</span><span class="nx">currentTheme</span><span class="p">];</span>
+
+  <span class="kd">const</span> <span class="nx">root</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">html</span><span class="dl">'</span><span class="p">);</span>
+  <span class="nx">root</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">currentTheme</span><span class="p">);</span>
+
+  <span class="nx">toggler</span><span class="p">.</span><span class="nx">onclick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">next</span> <span class="o">=</span> <span class="nx">currentTheme</span> <span class="o">==</span> <span class="dl">"</span><span class="s2">light</span><span class="dl">"</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">dark</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">light</span><span class="dl">'</span><span class="p">;</span>
+    <span class="nx">root</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">currentTheme</span><span class="p">);</span>
+    <span class="nx">root</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">next</span><span class="p">);</span>
+
+    <span class="nx">currentTheme</span> <span class="o">=</span> <span class="nx">next</span><span class="p">;</span>
+    <span class="nx">toggler</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">themes</span><span class="p">[</span><span class="nx">currentTheme</span><span class="p">];</span>
+    <span class="k">try</span> <span class="p">{</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">"</span><span class="s2">theme</span><span class="dl">"</span><span class="p">,</span><span class="nx">currentTheme</span><span class="p">)</span> <span class="p">}</span> 
+    <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span><span class="cm">/* noop */</span><span class="p">}</span>
+  <span class="p">}</span>
+  <span class="nb">window</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="dl">"</span><span class="s2">loaded</span><span class="dl">"</span><span class="p">)}</span>
+<span class="nt">&lt;/script&gt;</span></code></pre></figure>
+
+<p>Styles I added/changed</p>
+
+<figure class="highlight"><pre><code class="language-scss" data-lang="scss"><span class="k">@mixin</span> <span class="nf">dark-theme</span> <span class="p">{</span>
+  <span class="na">--code-bg</span><span class="p">:</span> <span class="mh">#282a36</span><span class="p">;</span>
+  <span class="na">--bg</span><span class="p">:</span> <span class="nf">rgba</span><span class="p">(</span><span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="mi">.9</span><span class="p">);</span>
+  <span class="na">--text</span><span class="p">:</span> <span class="no">white</span><span class="p">;</span>
+  <span class="na">--link</span><span class="p">:</span> <span class="mh">#a0d86c</span><span class="p">;</span>
+  <span class="na">--link-2</span><span class="p">:</span> <span class="mh">#e2872c</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">html</span> <span class="p">{</span>
+  <span class="na">--code</span><span class="p">:</span> <span class="mh">#fff</span><span class="p">;</span>
+  <span class="na">--code-bg</span><span class="p">:</span> <span class="mh">#282a36</span><span class="p">;</span>
+  <span class="na">--text</span><span class="p">:</span> <span class="mh">#222</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">@media</span> <span class="p">(</span><span class="n">prefers-color-scheme</span><span class="o">:</span> <span class="n">dark</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nt">html</span><span class="nd">:not</span><span class="o">(</span><span class="nc">.light</span><span class="o">)</span> <span class="p">{</span>
+    <span class="k">@include</span> <span class="nd">dark-theme</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="nt">html</span><span class="nc">.dark</span> <span class="p">{</span>
+  <span class="k">@include</span> <span class="nd">dark-theme</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nc">.dark</span> <span class="p">{</span>
+  <span class="nt">a</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="nf">var</span><span class="p">(</span><span class="o">--</span><span class="n">link-2</span><span class="p">);</span>
+    <span class="k">&amp;</span><span class="nd">:visited</span> <span class="p">{</span>
+      <span class="nl">color</span><span class="p">:</span> <span class="nf">var</span><span class="p">(</span><span class="o">--</span><span class="n">link</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nt">html</span><span class="nc">.loaded</span> <span class="nt">body</span> <span class="p">{</span>
+  <span class="nl">transition</span><span class="p">:</span> <span class="n">all</span> <span class="m">0</span><span class="mi">.3s</span> <span class="n">ease-in-out</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p><br />
+Note that we add a smooth transition between light-dark mode and only enable once the page has loaded. This is to prevent flashes of black/white before and after loading. It will also prevent transitions when entering the page  if a user <em>prefers dark mode</em> but has already visited our site and chosen a theme.</p>
+<h2 id="writing-our-custom-plugin">Writing our custom plugin</h2>
+<p>Adding custom plugins to Jekyll is fairly easy, just create a .rb file under the <code class="language-plaintext highlighter-rouge">_plugins</code> folder and you’re ready to go.</p>
+
+<p>Jekyll exposes hooks you can use to transform the output of your build, since we want to replace text matching :<span>hype</span>: for the corresponding HTML to embed <img class="bttv" src="https://cdn.betterttv.net/emote/5b6ded5560d17f4657e1319e/1x">, the following should do the trick:</p>
+
+<figure class="highlight"><pre><code class="language-rb" data-lang="rb"><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="n">list</span><span class="p">)</span>
+  <span class="n">list</span><span class="p">.</span><span class="nf">each_with_object</span><span class="p">({})</span> <span class="k">do</span> <span class="o">|</span><span class="nb">hash</span><span class="p">,</span> <span class="n">acc</span><span class="o">|</span>
+    <span class="nb">id</span><span class="p">,</span> <span class="n">src</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">.</span><span class="nf">values_at</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"src"</span><span class="p">)</span>
+    <span class="n">acc</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">embed_emotes</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">page</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">emotes</span> <span class="o">=</span> <span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s1">'emotes'</span><span class="p">]</span> <span class="o">||=</span> <span class="n">to_dict</span><span class="p">(</span><span class="no">Jekyll</span><span class="p">.</span><span class="nf">sites</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">data</span><span class="p">[</span><span class="s1">'emotes'</span><span class="p">]))</span>
+
+  <span class="n">page</span><span class="p">.</span><span class="nf">content</span> <span class="o">=</span> <span class="n">page</span><span class="p">.</span><span class="nf">content</span><span class="p">.</span><span class="nf">gsub</span><span class="p">(</span><span class="sr">/:(?&lt;variant&gt;\w+\.)?(?&lt;id&gt;\w+):/</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">match</span><span class="o">|</span>
+    <span class="nb">id</span><span class="p">,</span> <span class="n">variant</span> <span class="o">=</span> <span class="no">Regexp</span><span class="p">.</span><span class="nf">last_match</span><span class="p">.</span><span class="nf">values_at</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"variant"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">emotes</span><span class="p">.</span><span class="nf">key?</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+      <span class="n">cls</span> <span class="o">=</span> <span class="s1">'bttv'</span>
+      <span class="n">cls</span> <span class="o">+=</span> <span class="s1">' mega'</span> <span class="k">if</span> <span class="n">variant</span> <span class="o">==</span> <span class="s1">'mega.'</span>
+      <span class="sx">%(&lt;img class="#{cls}" src="#{emotes[id]}"&gt;)</span>
+    <span class="k">else</span>
+      <span class="n">match</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="p">}</span>
+
+<span class="no">Jekyll</span><span class="o">::</span><span class="no">Hooks</span><span class="p">.</span><span class="nf">register</span> <span class="sx">%i[posts pages]</span><span class="p">,</span> <span class="ss">:post_convert</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">embed_emotes</span></code></pre></figure>
+
+<p>The <code class="language-plaintext highlighter-rouge">post_convert</code> event tells Jekyll to run our block after the markdown has been converted to HTML but, before it is inserted into the layout. We register our transforming logic for both posts and pages that have been processed from markdown.</p>
+
+<p>Next thing we’ll need to add some emotes in order for our previous plugin to actually do something, we’ll put these in a JSON file inside the <code class="language-plaintext highlighter-rouge">_data</code> folder so that we can access them within our plugin and later generate a page listing the current emojis.</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"src"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://cdn.betterttv.net/emote/5f43037db2efd65d77e8a88f/2x"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ratdance"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+</span><span class="p">]</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"># Emotes
+<span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"display:flex; flex-wrap: wrap;"</span><span class="nt">&gt;</span>
+{%- for item in site.data.emotes -%}
+  <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"width: 64px; padding: 0 1rem;"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"{{item.src}}"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;p</span> <span class="na">style=</span><span class="s">"text-align: center"</span><span class="nt">&gt;</span>{{item.id}}<span class="nt">&lt;/p&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+{% endfor %}
+<span class="nt">&lt;div&gt;</span></code></pre></figure>
+
+<p>We can test that our emotes work after reloading Jekyll, we’ll want to deploy our site after this, and can easily do so by running <code class="language-plaintext highlighter-rouge">jekyll build</code> and pushing the contents to a <code class="language-plaintext highlighter-rouge">gh-branch</code> within our repo.</p>
+
+<p>…And that’s it for this post, it’s indeed very interesting to see what you can achieve with so little using Jekyll. I am looking forward to customizing it more as this site’s content grows.</p>
+
+<p><img class="bttv mega" src="https://cdn.betterttv.net/emote/5de8de2291129e77b47ca477/2x"></p>
+
+</article>
+      </div>
+    </main>
+  </body>
+</html>

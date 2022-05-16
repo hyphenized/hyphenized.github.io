@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-05-16T03:12:02-05:00</updated><id>/feed.xml</id><title type="html">hyphenized.dev</title><subtitle>Random thoughts and hopefully useful material for you</subtitle><author><name>hyphenized</name></author><entry><title type="html">Improving your Rails app load speeds</title><link href="/http/nginx/caching/speed/2022/05/15/easy-caching-with-nginx.html" rel="alternate" type="text/html" title="Improving your Rails app load speeds" /><published>2022-05-15T00:25:00-05:00</published><updated>2022-05-15T00:25:00-05:00</updated><id>/http/nginx/caching/speed/2022/05/15/easy-caching-with-nginx</id><content type="html" xml:base="/http/nginx/caching/speed/2022/05/15/easy-caching-with-nginx.html"><![CDATA[<h3 id="1-add-a-cdn-on-top-of-your-application">1. Add a CDN on top of your application</h3>
+<p>Content delivery networks speed up your application by distributing copies(cached data) of your application responses from locations closer to your users.</p>
+
+<p>Using a Content Delivery Network should add a small overhead for handling dynamic content requests (<em>since these can’t be cached</em>) and cache misses (<em>which happen when the CDN servers don’t have a cached response yet and have proxy the request to your server</em>). However, it’s almost unnoticeable since CDNs tipically use special kind of servers called <em>edge servers</em> which are <strong>very close</strong> to your users. Consequently, the data coming back to your users spends less time in transit due to requiring less hops to reach their final destination. CDNs greatly reduce overall loading time by caching your application assets/responses across edge servers.</p>
+
+<p>CDNs also have the benefit of providing protection against increased bursts of traffic (in case your application becomes really popular) and DDoS protection. Some of them also offer additional features like compression, to further optimize your assets delivery.</p>
+
+<p>Use something like Cloudfront/Cloudflare. Cloudflare has a generous free tier(Even if you’re planning on build a SaaS). They also have good resources on this topic.</p>
+
+<h3 id="2-reduce-connection-latency-between-serverclients">2. Reduce connection latency between server/clients</h3>
+<p>No matter how optimized your application assets are or how fast your internet connection is, when it comes to downloading a bunch of files RTT(Round trip time) is what matters the most. If a request sent from your users device takes as much as 200 ms to reach your server then your users will leave your page before it even finishes loading.</p>
+
+<p>You might argue that your internet speed is very fast, and it might be, but in order to download multiple assets your users browser might need to establish multiple connections at the same time. If each one of those had a RTT of 200ms then a full page load could end up taking around ~1 second for a small website with 5 assets <img class="bttv" src="https://cdn.betterttv.net/emote/583202340ca17361b7e6157f/2x">. It’s actually much more complicated than that but the point is that for most users <a href="https://community.f5.com/t5/technical-articles/rtt-round-trip-time-aka-ndash-why-bandwidth-doesn-rsquo-t-matter/ta-p/275342">latency has a bigger impact than bandwith</a>.</p>
+
+<p>If you’re interested, this is a good read on latency: <a href="http://www.stuartcheshire.org/rants/latency.html">It’s the latency, stupid</a>.</p>
+
+<p>When hosting on a VPS, be sure to choose a datacenter that’s closest to your target audience.</p>
+
+<h3 id="3-delegate-static-assets-serving-to-a-web-server">3. Delegate static assets serving to a web server</h3>
+<p>Rails <strong>should not</strong> be handling static asset requests. Ruby is a beautiful language, very fast to code software in, but not as fast to run it. To add to that, the more time your Rails server spends processing requests for static assets, the less it will be able to focus on actually running your application’s logic.</p>
+
+<p>Use something like nginx, there are faster web servers around nowadays but I suspect you should be able to get started quickly. Since most people are familiar with it, you should also be able to get help fast if you have issues while setting it up.</p>
+
+<h3 id="4-use-http320">4. Use HTTP3/2.0</h3>
+<p>One of the greatest improvements of <a href="https://web.dev/performance-http2/">HTTP 2.0</a> is request multiplexing, which allows sending multiple requests/responses over a single connection. This eliminates the need for reducing requests with hacks like asset concatenation and image sprites.</p>
+
+<p>HTTP 2.0 is supported by most (if not all) browers nowadays and fully backwards compatible with HTTP 1.1 so there’s very little reason for not including support for it.</p>
+
+<p>HTTP3/ HTTP over QUIC is the newest thing around and it is much faster than HTTP 2 but browser support is still very poor. That being said, some CDNs already support it and if you want to play with it on your server you can do so by following <a href="https://github.com/cloudflare/quiche/tree/master/nginx">this guide</a>. Moreover, since QUIC works over UDP you might need to change your firewall rules.</p>
+
+<h4 id="how-do-i-know-which-protocol-i-am-using">How do I know which protocol I am using?</h4>
+<p>Check the network panel on your browser devtools, enable the protocol column and check it’s value, on Chrome the protocol column displays h3 for HTTP3.</p>
+
+<h3 id="5-optimize-bundle-and-minify-assets">5. Optimize, bundle and minify assets</h3>
+<p>Most, if not all things under this point are probably covered by something like pagespeed insights. What pagespeed won’t tell you(<em>nor should it have to</em>) is that you shouldn’t serve polyfills for promises if your web application requires devices to support something like WebGL(It doesn’t make much sense). Specifying target browsers will reduce the amount of polyfills and prefixes shipped within your JavaScript/CSS bundles, which in turn will greatly improve load speeds <img class="bttv" src="https://cdn.betterttv.net/emote/5b6ded5560d17f4657e1319e/1x">.</p>
+
+<p>For images/SVGs/videos it depends, sometimes, if the asset is small enough it might make more sense to base64 embed it to prevent an extra request. In the past, before HTTP 2.0 developers would often generate a sprite to load a bunch of small images within a single request but, you probably don’t won’t need to do that nowadays.</p>
+
+<p>Use modern image formats like WebP and include responsive variants, this might be hard to achieve if you have to handle a lot of user submitted images but it is doable. You’ll likely want to enable brotli/gzip compression for text-like assets as well.</p>
+
+<p>Finally, for videos it’s a good idea to focus on bitrate and compression(codec). WebM(VP8/VP9) with a bitrate of at least 3 Mbps has worked well for me.</p>
+
+<h3 id="6-use-conditional-gets-and-good-cache-directives">6. Use conditional gets and good cache directives</h3>
+<p>Within your application controllers, you can easily set etags and cache expires using helpers like <code class="language-plaintext highlighter-rouge">fresh_when</code>/<code class="language-plaintext highlighter-rouge">stale_if</code> to minimize the resources spent by your server to process the request.
+There’s also partial/fragment caching but I won’t cover that here.</p>
+
+<p>Make sure you don’t cache dynamic content requests outside of Rails. Otherwise you risk having a user see another user’s logged in page (unless that’s what you want <img class="bttv" src="https://cdn.betterttv.net/emote/5de20a2c2dea2902de074598/2x">)</p>
+
+<h3 id="finally-make-sure-to-use-something-like-curl-to-test-that-everything-is-working-the-way-you-expect-it-to">Finally, make sure to use something like curl to test that everything is working the way you expect it to.</h3>]]></content><author><name>hyphenized</name></author><category term="http" /><category term="nginx" /><category term="caching" /><category term="speed" /><summary type="html"><![CDATA[1. Add a CDN on top of your application Content delivery networks speed up your application by distributing copies(cached data) of your application responses from locations closer to your users.]]></summary></entry><entry><title type="html">Thoughts on React</title><link href="/react/2022/05/12/thoughts-on-react.html" rel="alternate" type="text/html" title="Thoughts on React" /><published>2022-05-12T14:13:00-05:00</published><updated>2022-05-12T14:13:00-05:00</updated><id>/react/2022/05/12/thoughts-on-react</id><content type="html" xml:base="/react/2022/05/12/thoughts-on-react.html"><![CDATA[<p>Having used React for a while I’ve started to find annoying the amount of boilerplate code that you need to achieve basic operations (which does not happen in other frameworks). For instance in Svelte you can define a variable <code class="language-plaintext highlighter-rouge">counter</code> to store your state, modify it directly and everything works fine out of the box. But, in React you would have to call useState(), deconstruct an array to get a reference to both a possibly stale value (unless you store it in a ref, then you have some other problems) and an updater function, not to say if you have custom logic handling you might also need to memoize and wrap this updater inside a handler function.</p>
+
+<p>You could get around this last point if you stick to class components but apparently, besides the slightly higher footprint that they have, in some cases they could end up increasing the amount of boilerplate code too.</p>
+
+<p>For what is worth, I am not saying Svelte is perfect (because it is not) but, I think developer happiness matters too!</p>
+
+<h4 id="why-do-you-work-with-react-then">Why do you work with React then?</h4>
+
+<p>Gotta know the rules to break ‘em. <img class="bttv" src="https://cdn.betterttv.net/emote/55f47f507f08be9f0a63ce37/2x"></p>]]></content><author><name>hyphenized</name></author><category term="react" /><summary type="html"><![CDATA[Having used React for a while I’ve started to find annoying the amount of boilerplate code that you need to achieve basic operations (which does not happen in other frameworks). For instance in Svelte you can define a variable counter to store your state, modify it directly and everything works fine out of the box. But, in React you would have to call useState(), deconstruct an array to get a reference to both a possibly stale value (unless you store it in a ref, then you have some other problems) and an updater function, not to say if you have custom logic handling you might also need to memoize and wrap this updater inside a handler function.]]></summary></entry><entry><title type="html">Perfectionism and software development</title><link href="/software/perfectionism/2022/05/12/perfectionism-and-software-development.html" rel="alternate" type="text/html" title="Perfectionism and software development" /><published>2022-05-12T14:10:00-05:00</published><updated>2022-05-12T14:10:00-05:00</updated><id>/software/perfectionism/2022/05/12/perfectionism-and-software-development</id><content type="html" xml:base="/software/perfectionism/2022/05/12/perfectionism-and-software-development.html"><![CDATA[<h3 id="why-perfectionism-is-not-a-good-approach-for-software-development">Why perfectionism is not a good approach for software development</h3>
+<p>I used to spend a lot of time focusing on the best possible solution, until I learnt that no matter how good your design/code/whatever-you-call-it is, with time, requirements change and with that, the code you dedicated hours to could end up being thrown away. Thus, I realized perfectionism would not give me an acceptable solution in a mindful amount of time.</p>
+
+<p>That doesn’t mean you should forget about attention to detail when designing a solution, just don’t go overboard with it. As some people say: “done is better than perfect”.</p>
+<h3 id="what-about-purists">What about <a href="https://automationpanda.com/2017/09/26/purist-vs-pragmatist/">purists?</a>?</h3>
+
+<p>I admire their work and I think it is with the same dedication they have that we often improve our skills.</p>]]></content><author><name>hyphenized</name></author><category term="software" /><category term="perfectionism" /><summary type="html"><![CDATA[Why perfectionism is not a good approach for software development I used to spend a lot of time focusing on the best possible solution, until I learnt that no matter how good your design/code/whatever-you-call-it is, with time, requirements change and with that, the code you dedicated hours to could end up being thrown away. Thus, I realized perfectionism would not give me an acceptable solution in a mindful amount of time.]]></summary></entry><entry><title type="html">Making of this site</title><link href="/jekyll/2022/05/10/making-of-this-site.html" rel="alternate" type="text/html" title="Making of this site" /><published>2022-05-10T20:13:51-05:00</published><updated>2022-05-10T20:13:51-05:00</updated><id>/jekyll/2022/05/10/making-of-this-site</id><content type="html" xml:base="/jekyll/2022/05/10/making-of-this-site.html"><![CDATA[<h4 id="wheres-all-the-javascriptreactsveltevueetc-">Where’s all the JavaScript/React/Svelte/Vue/etc ?</h4>
+
+<p>This site has no JavaScript(besides the dark mode toggler of course).</p>
+
+<p><em>“But why?”</em> you might ask, the main reason I chose to make it using HTML/CSS instead of using an static site generator like Gatsby or the like is that, nowadays most websites suffer of having unnecessary big bundles of JavaScript loading instead of what users actually visited the site for, content.</p>
+
+<p>Initially I wanted to make something shimmering that would showcase my skills/proficiency, probably with three.js, gsap and all that fancy stuff. However, including three.js alone would cause this website to load several times(6x~) slower! I chose to keep this stupid simple so that you, the reader/googlebot could save the most precious resource that you’ll never recover, time (<em>probably battery, cpu cycles, mobile data and some other things as well</em>).</p>
+
+<p>I think every developer should be mindful of the decisions they take, and not just do things because everyone else is doing them that way. That being said, there’s nothing wrong with trying out new technologies. What is wrong, however, is creating a problem where none exists as an excuse to implement a solution.</p>
+
+<div class="meme"><img src="/assets/memes/programmer_move.jpg" alt="I should write something to describe this image" /></div>
+
+<h4 id="kick-starting-the-blog-with-jekyll">Kick starting the blog with Jekyll</h4>
+
+<p>I have never used Jekyll before, but it’s very simple, you write some templates/layouts, then add some content in the form of markdown files and bang! There’s a blog.</p>
+
+<p>I would have enjoyed the process of getting everything ready much more had I not made a few mistakes along the way. I followed the quick start tutorial at Jekyll’s and soon ran across an issue after trying to use a theme that I liked.</p>
+
+<p>At the moment of writing, you need version <a href="https://pages.github.com/versions/">jekyll@3.9.2</a> for GitHub Pages to work. Unfortunately, the theme I chose was not compatible with Jekyll 4 and I did not realize this until I found out that the version 0.1 of the theme had been installed <img class="bttv" src="https://cdn.betterttv.net/emote/572accb540dbc1cb345d782b/1x">.</p>
+
+<p>I then switched back to Jekyll 3.9.2 but later I realized that wasn’t necessary because I could build my site locally and have GitHub pages serve that(or do the build step in a GH actions CI container).</p>
+
+<p>Doing the build step through Github Pages was not an option if I wanted to use a custom plugin to embed the bttv emojis since <a href="https://github.com/jekyll/jekyll/blob/v3.9.2/docs/_docs/plugins.md">GH Pages runs Jekyll in safe mode</a> (<em>which means no custom plugins</em>).</p>
+
+<p>Anyway enough talk, lets begin.</p>
+
+<div style="text-align: center">
+
+<img src="/assets/img/elizabethdevtools.jpg" />
+<em>This is where your data savings are going to</em>
+</div>
+
+<h2 id="picking-a-theme">Picking a theme</h2>
+
+<p>I found a theme I liked at <a href="https://jamstackthemes.dev/ssg/jekyll/">https://jamstackthemes.dev/ssg/jekyll/</a>. That being said, it didn’t work out of the box so if you’re unable to get everything working the problem might either be your version of jekyll, the theme, or something else (I’d check in that order).</p>
+
+<p>You can find some themes for code highlighting here:
+<a href="https://stylishthemes.github.io/Syntax-Themes/pygments/">https://stylishthemes.github.io/Syntax-Themes/pygments/</a> 
+or, make a custom one <a href="https://jwarby.github.io/jekyll-pygments-themes/builder.html">here</a>:</p>
+
+<h2 id="adding-dark-mode">Adding Dark mode</h2>
+<p>The easiest (and quickest) way to add dark mode to your website would be to just add something like <a href="https://watercss.netlify.app/">watercss</a>.</p>
+
+<p>However as you’ll see, adding dark mode is a piece of cake without any external dependencies. You only need css variables, media queries that target <code class="language-plaintext highlighter-rouge">prefers-color-scheme</code> and a small script to allow your users to toggle between both themes.</p>
+
+<p>We don’t have to worry too much about browser support since right now <a href="https://caniuse.com/css-variables">CSS Variables are supported by at least 94% of all browsers</a>. The story is a bit different for <code class="language-plaintext highlighter-rouge">prefers-color-scheme</code> but for those cases, we can load the light theme by default and allow the user to change it manually.</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">"toggler"</span> <span class="na">type=</span><span class="s">"button"</span><span class="nt">&gt;</span>TOGGLE<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+  <span class="kd">const</span> <span class="nx">themes</span> <span class="o">=</span> <span class="p">{</span> <span class="na">dark</span><span class="p">:</span> <span class="dl">"</span><span class="s2">🌙</span><span class="dl">"</span><span class="p">,</span> <span class="na">light</span><span class="p">:</span> <span class="dl">"</span><span class="s2">☀</span><span class="dl">"</span> <span class="p">};</span>
+  
+  <span class="kd">const</span> <span class="nx">defaultTheme</span> <span class="o">=</span> <span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">saved</span> <span class="o">=</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">"</span><span class="s2">theme</span><span class="dl">"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">saved</span> <span class="o">||</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">matchMedia</span><span class="p">(</span><span class="dl">'</span><span class="s1">(prefers-color-scheme: dark)</span><span class="dl">'</span><span class="p">).</span><span class="nx">matches</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">dark</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">light</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">})();</span>
+
+  <span class="kd">let</span> <span class="nx">currentTheme</span> <span class="o">=</span> <span class="nx">defaultTheme</span><span class="p">;</span>
+  <span class="nx">toggler</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">themes</span><span class="p">[</span><span class="nx">currentTheme</span><span class="p">];</span>
+
+  <span class="kd">const</span> <span class="nx">root</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">html</span><span class="dl">'</span><span class="p">);</span>
+  <span class="nx">root</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">currentTheme</span><span class="p">);</span>
+
+  <span class="nx">toggler</span><span class="p">.</span><span class="nx">onclick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">next</span> <span class="o">=</span> <span class="nx">currentTheme</span> <span class="o">==</span> <span class="dl">"</span><span class="s2">light</span><span class="dl">"</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">dark</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">light</span><span class="dl">'</span><span class="p">;</span>
+    <span class="nx">root</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">currentTheme</span><span class="p">);</span>
+    <span class="nx">root</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="nx">next</span><span class="p">);</span>
+
+    <span class="nx">currentTheme</span> <span class="o">=</span> <span class="nx">next</span><span class="p">;</span>
+    <span class="nx">toggler</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">themes</span><span class="p">[</span><span class="nx">currentTheme</span><span class="p">];</span>
+    <span class="k">try</span> <span class="p">{</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">"</span><span class="s2">theme</span><span class="dl">"</span><span class="p">,</span><span class="nx">currentTheme</span><span class="p">)</span> <span class="p">}</span> 
+    <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span><span class="cm">/* noop */</span><span class="p">}</span>
+  <span class="p">}</span>
+  <span class="nb">window</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">toggle</span><span class="p">(</span><span class="dl">"</span><span class="s2">loaded</span><span class="dl">"</span><span class="p">)}</span>
+<span class="nt">&lt;/script&gt;</span></code></pre></figure>
+
+<p>Styles I added/changed</p>
+
+<figure class="highlight"><pre><code class="language-scss" data-lang="scss"><span class="k">@mixin</span> <span class="nf">dark-theme</span> <span class="p">{</span>
+  <span class="na">--code-bg</span><span class="p">:</span> <span class="mh">#282a36</span><span class="p">;</span>
+  <span class="na">--bg</span><span class="p">:</span> <span class="nf">rgba</span><span class="p">(</span><span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="mi">.9</span><span class="p">);</span>
+  <span class="na">--text</span><span class="p">:</span> <span class="no">white</span><span class="p">;</span>
+  <span class="na">--link</span><span class="p">:</span> <span class="mh">#a0d86c</span><span class="p">;</span>
+  <span class="na">--link-2</span><span class="p">:</span> <span class="mh">#e2872c</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">html</span> <span class="p">{</span>
+  <span class="na">--code</span><span class="p">:</span> <span class="mh">#fff</span><span class="p">;</span>
+  <span class="na">--code-bg</span><span class="p">:</span> <span class="mh">#282a36</span><span class="p">;</span>
+  <span class="na">--text</span><span class="p">:</span> <span class="mh">#222</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">@media</span> <span class="p">(</span><span class="n">prefers-color-scheme</span><span class="o">:</span> <span class="n">dark</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nt">html</span><span class="nd">:not</span><span class="o">(</span><span class="nc">.light</span><span class="o">)</span> <span class="p">{</span>
+    <span class="k">@include</span> <span class="nd">dark-theme</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="nt">html</span><span class="nc">.dark</span> <span class="p">{</span>
+  <span class="k">@include</span> <span class="nd">dark-theme</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nc">.dark</span> <span class="p">{</span>
+  <span class="nt">a</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="nf">var</span><span class="p">(</span><span class="o">--</span><span class="n">link-2</span><span class="p">);</span>
+    <span class="k">&amp;</span><span class="nd">:visited</span> <span class="p">{</span>
+      <span class="nl">color</span><span class="p">:</span> <span class="nf">var</span><span class="p">(</span><span class="o">--</span><span class="n">link</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nt">html</span><span class="nc">.loaded</span> <span class="nt">body</span> <span class="p">{</span>
+  <span class="nl">transition</span><span class="p">:</span> <span class="n">all</span> <span class="m">0</span><span class="mi">.3s</span> <span class="n">ease-in-out</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p><br />
+Note that we add a smooth transition between light-dark mode and only enable once the page has loaded. This is to prevent flashes of black/white before and after loading. It will also prevent transitions when entering the page  if a user <em>prefers dark mode</em> but has already visited our site and chosen a theme.</p>
+<h2 id="writing-our-custom-plugin">Writing our custom plugin</h2>
+<p>Adding custom plugins to Jekyll is fairly easy, just create a .rb file under the <code class="language-plaintext highlighter-rouge">_plugins</code> folder and you’re ready to go.</p>
+
+<p>Jekyll exposes hooks you can use to transform the output of your build, since we want to replace text matching :<span>hype</span>: for the corresponding HTML to embed <img class="bttv" src="https://cdn.betterttv.net/emote/5b6ded5560d17f4657e1319e/1x">, the following should do the trick:</p>
+
+<figure class="highlight"><pre><code class="language-rb" data-lang="rb"><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="n">list</span><span class="p">)</span>
+  <span class="n">list</span><span class="p">.</span><span class="nf">each_with_object</span><span class="p">({})</span> <span class="k">do</span> <span class="o">|</span><span class="nb">hash</span><span class="p">,</span> <span class="n">acc</span><span class="o">|</span>
+    <span class="nb">id</span><span class="p">,</span> <span class="n">src</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">.</span><span class="nf">values_at</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"src"</span><span class="p">)</span>
+    <span class="n">acc</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">embed_emotes</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">page</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">emotes</span> <span class="o">=</span> <span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s1">'emotes'</span><span class="p">]</span> <span class="o">||=</span> <span class="n">to_dict</span><span class="p">(</span><span class="no">Jekyll</span><span class="p">.</span><span class="nf">sites</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">data</span><span class="p">[</span><span class="s1">'emotes'</span><span class="p">]))</span>
+
+  <span class="n">page</span><span class="p">.</span><span class="nf">content</span> <span class="o">=</span> <span class="n">page</span><span class="p">.</span><span class="nf">content</span><span class="p">.</span><span class="nf">gsub</span><span class="p">(</span><span class="sr">/:(?&lt;variant&gt;\w+\.)?(?&lt;id&gt;\w+):/</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">match</span><span class="o">|</span>
+    <span class="nb">id</span><span class="p">,</span> <span class="n">variant</span> <span class="o">=</span> <span class="no">Regexp</span><span class="p">.</span><span class="nf">last_match</span><span class="p">.</span><span class="nf">values_at</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"variant"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">emotes</span><span class="p">.</span><span class="nf">key?</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+      <span class="n">cls</span> <span class="o">=</span> <span class="s1">'bttv'</span>
+      <span class="n">cls</span> <span class="o">+=</span> <span class="s1">' mega'</span> <span class="k">if</span> <span class="n">variant</span> <span class="o">==</span> <span class="s1">'mega.'</span>
+      <span class="sx">%(&lt;img class="#{cls}" src="#{emotes[id]}"&gt;)</span>
+    <span class="k">else</span>
+      <span class="n">match</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="p">}</span>
+
+<span class="no">Jekyll</span><span class="o">::</span><span class="no">Hooks</span><span class="p">.</span><span class="nf">register</span> <span class="sx">%i[posts pages]</span><span class="p">,</span> <span class="ss">:post_convert</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">embed_emotes</span></code></pre></figure>
+
+<p>The <code class="language-plaintext highlighter-rouge">post_convert</code> event tells Jekyll to run our block after the markdown has been converted to HTML but, before it is inserted into the layout. We register our transforming logic for both posts and pages that have been processed from markdown.</p>
+
+<p>Next thing we’ll need to add some emotes in order for our previous plugin to actually do something, we’ll put these in a JSON file inside the <code class="language-plaintext highlighter-rouge">_data</code> folder so that we can access them within our plugin and later generate a page listing the current emojis.</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"src"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://cdn.betterttv.net/emote/5f43037db2efd65d77e8a88f/2x"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ratdance"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+</span><span class="p">]</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"># Emotes
+<span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"display:flex; flex-wrap: wrap;"</span><span class="nt">&gt;</span>
+{%- for item in site.data.emotes -%}
+  <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"width: 64px; padding: 0 1rem;"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"{{item.src}}"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;p</span> <span class="na">style=</span><span class="s">"text-align: center"</span><span class="nt">&gt;</span>{{item.id}}<span class="nt">&lt;/p&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+{% endfor %}
+<span class="nt">&lt;div&gt;</span></code></pre></figure>
+
+<p>We can test that our emotes work after reloading Jekyll, we’ll want to deploy our site after this, and can easily do so by running <code class="language-plaintext highlighter-rouge">jekyll build</code> and pushing the contents to a <code class="language-plaintext highlighter-rouge">gh-branch</code> within our repo.</p>
+
+<p>…And that’s it for this post, it’s indeed very interesting to see what you can achieve with so little using Jekyll. I am looking forward to customizing it more as this site’s content grows.</p>
+
+<p><img class="bttv mega" src="https://cdn.betterttv.net/emote/5de8de2291129e77b47ca477/2x"></p>]]></content><author><name>hyphenized</name></author><category term="jekyll" /><summary type="html"><![CDATA[Where’s all the JavaScript/React/Svelte/Vue/etc ?]]></summary></entry></feed>
